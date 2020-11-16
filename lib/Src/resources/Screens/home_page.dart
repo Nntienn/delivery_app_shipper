@@ -1,9 +1,8 @@
 import 'package:delivery_app_shipper_shipper/Src/configs/constants.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/Product.dart';
-import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/delivery_history_card.dart';
+import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/request_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
@@ -21,15 +20,21 @@ class HomePage extends StatefulWidget {
 }
 
 class MyMapsState extends State<HomePage> {
+  Set<Polyline> _polylines = {};
   double mylat = 0;
   double mylng = 0;
+  PolylinePoints polylinePoints = PolylinePoints();
   var _scaffoldKey = new GlobalKey<ScaffoldState>();
   LatLng _initialcameraposition = LatLng(10.835691, 106.807665);
   GoogleMapController _controller;
+  List<LatLng> polylineCoordinates = [];
   Location _location = Location();
   int _currentIndex = 1;
   Set<Marker> _markers = {};
   double _pinPillPosition = -500;
+  String googleAPIKey = "AIzaSyBDJpX-xIqijJq2wLy3sP5lug3LSpYngbo";
+  bool statusconfirm= false;
+
 
   BitmapDescriptor destinationIcon;
   BitmapDescriptor destinationIcon1;
@@ -44,35 +49,31 @@ class MyMapsState extends State<HomePage> {
         'assets/locationpin2.png');
   }
 
-  @override
-  void initState() {
-    super.initState();
-    setSourceAndDestinationIcons();
-  }
-
   void setMapPins() {
     setState(() {
       _markers.add(Marker(
-          markerId: MarkerId('myLocation'),
-          position: SECOND_LOCATION,
-          icon: destinationIcon1,
-          onTap: () {
-            setState(() {
-              _pinPillPosition = 0;
-            });
-          }));
+          markerId: MarkerId('destPin'),
+          position: MY_LOCATION,
+          ));
     });
   }
+  @override
+  void initState() {
+    super.initState();
+
+    setSourceAndDestinationIcons();
+    setMapPins();
+  }
+
 
   void _onMapCreated(GoogleMapController _cntlr) {
-    setMapPins();
     _controller = _cntlr;
 
     print(_location.getLocation().toString());
     _location.onLocationChanged.listen((l) {
       _controller.animateCamera(
         CameraUpdate.newCameraPosition(
-            CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: 15)),
+            CameraPosition(target: LatLng(MY_LOCATION.latitude, MY_LOCATION.longitude), zoom: 15)),
       );
     });
   }
@@ -89,6 +90,7 @@ class MyMapsState extends State<HomePage> {
         child: Stack(
           children: <Widget>[
             GoogleMap(
+              polylines: _polylines,
               zoomControlsEnabled: false,
               myLocationButtonEnabled: false,
               initialCameraPosition:
@@ -120,42 +122,45 @@ class MyMapsState extends State<HomePage> {
               duration: Duration(milliseconds: 200),
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Expanded(
-                  child: Container(
-                    height: 330,
-                    padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
-                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x88999999),
-                            offset: Offset(0, 5),
-                            blurRadius: 5.0,
-                          ),
-                        ]),
-                    // padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
-                    child: GridView.builder(
-                        itemCount: 3,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          // mainAxisSpacing: kDefaultPaddin,
-                          crossAxisSpacing: kDefaultPaddin,
-                          childAspectRatio: 4,
+                child: Container(
+                  height: 330,
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
+                  margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x88999999),
+                          offset: Offset(0, 5),
+                          blurRadius: 5.0,
                         ),
-                        itemBuilder: (context, index) => ItemCard(
-                          product: products[index],
-                          press: (){},
-                          // => Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => BookingDetailPage(
-                          //         product: products[index],
-                          //       ),
-                          //     )),
-                        )),
-                  ),
+                      ]),
+                  // padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
+                  child: GridView.builder(
+                      itemCount: 3,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        // mainAxisSpacing: kDefaultPaddin,
+                        crossAxisSpacing: kDefaultPaddin,
+                        childAspectRatio: 4,
+                      ),
+                      itemBuilder: (context, index) => RequestCard(
+                        product: products[index],
+                        press: () {onPlaceSelected();
+                        setState(() {
+                          _pinPillPosition = -500;
+                        });
+                        }
+
+                        // => Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => BookingDetailPage(
+                        //         product: products[index],
+                        //       ),
+                        //     )),
+                      )),
                 ),
               ),
             )
@@ -169,16 +174,116 @@ class MyMapsState extends State<HomePage> {
         ),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 0.15,
-        child: FlatButton(
-          child: Text('Get request'),
-          onPressed: (){
+        child:
+        bottombutton()
+        // FlatButton(
+        //   child: Text('Get request'),
+        //   onPressed: (){
+        //     setState(() {
+        //       _pinPillPosition = 0;
+        //     });
+        //   },
+        // ),
+      ),
+    );
+  }
+  void _addMarker() {
+    setState(() {
+      _markers.add(Marker(
+          markerId: MarkerId('destPin1'),
+          position: SECOND_LOCATION,
+          icon: destinationIcon,
+          onTap: () {
             setState(() {
               _pinPillPosition = 0;
             });
-          },
-        ),
-      ),
-    );
+          }));
+      _markers.add(Marker(
+          markerId: MarkerId('destPin2'),
+          position: THIRD_LOCATION,
+          icon: destinationIcon,
+          onTap: () {
+            setState(() {
+              _pinPillPosition = 0;
+            });
+          }));
+    });
+  }
+
+  Widget bottombutton(){
+    if(statusconfirm){
+      return FlatButton(
+        child: Text('Get request'),
+        onPressed: (){
+          setState(() {
+            _pinPillPosition = 0;
+            statusconfirm =false;
+          });
+        },
+      );
+    }else{
+      return FlatButton(
+        child: Text('Done'),
+        onPressed: (){
+          setState(() {
+            _pinPillPosition = -500;
+              statusconfirm =true;
+          });
+        },
+      );
+    }
+  }
+
+  void onPlaceSelected () {
+    _addMarker();
+    setPolylines();
+  }
+  setPolylines() async {
+    List<PointLatLng> result1 = await polylinePoints?.getRouteBetweenCoordinates(
+        googleAPIKey,
+        MY_LOCATION.latitude,
+        MY_LOCATION.longitude,
+        THIRD_LOCATION.latitude,
+        THIRD_LOCATION.longitude);
+    List<PointLatLng> result = await polylinePoints?.getRouteBetweenCoordinates(
+        googleAPIKey,
+        THIRD_LOCATION.latitude,
+        THIRD_LOCATION.longitude,
+        SECOND_LOCATION.latitude,
+        SECOND_LOCATION.longitude);
+    if (result1.isNotEmpty) {
+      result1.forEach((PointLatLng point1) {
+        polylineCoordinates.add(LatLng(point1.latitude, point1.longitude));
+      });
+    }
+    if (result.isNotEmpty) {
+      result.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    }
+
+    setState(() {
+      // create a Polyline instance
+      // with an id, an RGB color and the list of LatLng pairs
+      Polyline polyline = Polyline(
+          polylineId: PolylineId("poly1"),
+          color: Color.fromARGB(255, 40, 122, 198),
+          width: 3,
+
+          points: polylineCoordinates);
+
+      Polyline polyline1 = Polyline(
+          polylineId: PolylineId("poly"),
+          color: Color.fromARGB(255, 40, 122, 198),
+          width: 3,
+          points: polylineCoordinates);
+
+      // add the constructed polyline as a set of points
+      // to the polyline set, which will eventually
+      // end up showing up on the map
+      _polylines.add(polyline);
+      _polylines.add(polyline1);
+    });
   }
 
   myBoxDecoration() {

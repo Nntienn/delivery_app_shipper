@@ -47,6 +47,10 @@ dependencies:
   email_validator: ^1.0.4
   google_maps_flutter: ^0.5.11+1
   location: ^3.0.2
+  flutter_polyline_points: ^0.1.0
+  geolocator: ^5.3.1
+  location_platform_interface: ^1.0.1
+
 
 dev_dependencies:
   flutter_test:

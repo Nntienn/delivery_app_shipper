@@ -21,7 +21,7 @@ class RequestCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                Text('From:'),
+                Text('Sender:'),
                 Spacer(),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 22, 0),
@@ -32,15 +32,22 @@ class RequestCard extends StatelessWidget {
                 )
               ],
             ),//đoạn này cộng chuỗi lấy điểm gửi
-            Text('To:'),//đoạn này cộng chuỗi lấy điểm nhận
-            Text('At:'),//Đoạn này cộng chuỗi lấy thời gian gửi
+            Text('From:'),//đoạn này cộng chuỗi lấy điểm nhận
+            Text('Receiver:'),//Đoạn này cộng chuỗi lấy thời gian gửi
             Row(
               children: [
-                Text('Decription'),
+                Text('To'),
                 Spacer(),
                 Container(height: 18,
-                  child: FlatButton(
-                    child: Text('detail', textAlign: TextAlign.end,style: TextStyle(color: Colors.redAccent, fontSize: 13),),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blueAccent,
+                      borderRadius: BorderRadius.all(Radius.circular(10))
+                    ),
+                    
+                    child: FlatButton(
+                      child: Text('Accept', textAlign: TextAlign.end,style: TextStyle(color: Colors.white, fontSize: 13),),
+                    ),
                   ),
                 )
 
@@ -64,3 +71,4 @@ class RequestCard extends StatelessWidget {
     );
   }
 }
+
