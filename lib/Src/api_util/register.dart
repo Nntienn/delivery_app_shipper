@@ -7,6 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/wallet.dart';
 
+import '../configs/link.dart';
+import '../configs/link.dart';
+
 class RegisterApi {
   Future<Response> postAccount(Account account) async {
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -18,12 +21,12 @@ class RegisterApi {
   Future<Response> postSender(Sender sender) async {
     Map<String, String> headers = {"Content-type": "application/json"};
     String json = jsonEncode(sender.toJson());
-    Response response = await post(POST_SENDER, headers: headers, body: json);
+    Response response = await post(POST_SHIPPER, headers: headers, body: json);
     return response;
   }
 
   Future<Response> getSenderByPhoneNum(String phone) async {
-    return http.get(GET_SENDER_BY_PHONE + phone);
+    return http.get(GET_SHIPPER_BY_PHONE + phone);
   }
 
   Future<Sender> convertJsonToSender(http.Response response) async {

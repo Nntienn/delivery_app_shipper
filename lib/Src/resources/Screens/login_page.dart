@@ -4,6 +4,7 @@ import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
 import 'package:delivery_app_shipper_shipper/Src/blocs/validation_bloc.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/account.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/sender.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/shipper.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/wallet.dart';
 import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -196,11 +197,11 @@ class _LoginPageState extends State<LoginPage> {
       String checkRole = await _loginBloc.getAccountRole(response);
       if (checkRole.compareTo("success") == 0) {
         Account account = await _loginBloc.convertJsonToAccount(response);
-        Response senderResponse = await _loginBloc.getSenderJsonByPhone(account.phoneNum);
-        Sender sender = await _loginBloc.convertJsonToSender(senderResponse);
+        Response shipperResponse = await _loginBloc.getShipperJsonByPhone(account.phoneNum);
+        Shipper shipper = await _loginBloc.convertJsonToShipper(shipperResponse);
         SaveData save = new SaveData();
-        save.saveSender(sender);
-        Response walletResponse = await _loginBloc.getWalletByWalletID(sender.walletId);
+        save.saveShipper(shipper);
+        Response walletResponse = await _loginBloc.getWalletByWalletID(shipper.walletId);
         Wallet wallet = await _loginBloc.convertJsonToWallet(walletResponse);
         save.saveBalance(wallet.amount);
         Navigator.push(
@@ -214,8 +215,7 @@ class _LoginPageState extends State<LoginPage> {
         _errAlert(context, "Account doesn't exist");
       }
     } else {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => RegisterPage()));
+      _errAlert(context, "Account is not in the system");
     }
   }
 
@@ -226,11 +226,11 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         String checkRole = await _loginBloc.getAccountRole(response);
         if (checkRole.compareTo("success") == 0) {
-          Response senderResponse = await _loginBloc.getSenderJsonByPhone(phoneNumberController.text);
-          Sender sender = await _loginBloc.convertJsonToSender(senderResponse);
+          Response shipperResponse = await _loginBloc.getShipperJsonByPhone(phoneNumberController.text);
+          Shipper shipper = await _loginBloc.convertJsonToShipper(shipperResponse);
           SaveData save = new SaveData();
-          save.saveSender(sender);
-          Response walletResponse = await _loginBloc.getWalletByWalletID(sender.walletId);
+          save.saveShipper(shipper);
+          Response walletResponse = await _loginBloc.getWalletByWalletID(shipper.walletId);
           Wallet wallet = await _loginBloc.convertJsonToWallet(walletResponse);
           save.saveBalance(wallet.amount);
           Navigator.push(
@@ -244,8 +244,7 @@ class _LoginPageState extends State<LoginPage> {
           _errAlert(context, "Account doesn't exist");
         }
       } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => RegisterPage()));
+        _errAlert(context, "Account is not in the system");
       }
     }
   }

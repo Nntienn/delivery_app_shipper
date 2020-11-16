@@ -1,5 +1,6 @@
 import 'package:delivery_app_shipper_shipper/Src/models/account.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/sender.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/shipper.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/wallet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,13 +11,13 @@ class SaveData {
     sp.setString('email', account.email);
   }
 
-  Future<void> saveSender(Sender sender) async {
+  Future<void> saveShipper(Shipper shipper) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    sp.setString('id', sender.id);
-    sp.setString('name', sender.name);
-    sp.setString('homeAddress', sender.homeAddress);
-    sp.setString('workAddress', sender.workAddress);
-    sp.setString('walletId', sender.walletId);
+    sp.setString('id', shipper.id);
+    sp.setString('name', shipper.name);
+    sp.setString('homeAddress', shipper.homeAddress);
+    sp.setString('workAddress', shipper.workAddress);
+    sp.setString('walletId', shipper.walletId);
   }
 
   Future<void> saveBalance(double balance) async {

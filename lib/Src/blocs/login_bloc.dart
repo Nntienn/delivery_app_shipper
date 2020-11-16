@@ -5,11 +5,14 @@ import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
 import 'package:delivery_app_shipper_shipper/Src/configs/link.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/account.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/sender.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/shipper.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/wallet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+
+import '../configs/link.dart';
 
 class LoginBloc{
   final codeController = new TextEditingController();
@@ -20,7 +23,7 @@ class LoginBloc{
     final responseResult = response;
     if (responseResult.statusCode == 200) {
       Account account =  Account.fromJson(jsonDecode(responseResult.body));
-      if (account.role.compareTo("sender") == 0) {
+      if (account.role.compareTo("shipper") == 0) {
         if (account.status == null){
           return "not exist";
         }
@@ -47,9 +50,9 @@ class LoginBloc{
     return wallet;
   }
 
-  Future<Sender> convertJsonToSender(Response response) async {
-    Sender sender = Sender.fromJson(jsonDecode(response.body));
-    return sender;
+  Future<Shipper> convertJsonToShipper(Response response) async {
+    Shipper shipper = Shipper.fromJson(jsonDecode(response.body));
+    return shipper;
   }
 
   Future<Account> convertJsonToAccount(http.Response response) async {
@@ -57,8 +60,8 @@ class LoginBloc{
     return account;
   }
 
-  Future<http.Response> getSenderJsonByPhone(String phone) async {
-    return http.get(GET_SENDER_BY_PHONE + phone);
+  Future<http.Response> getShipperJsonByPhone(String phone) async {
+    return http.get(GET_SHIPPER_BY_PHONE + phone);
   }
 
   Future<http.Response> getAccountJsonByEmail(String email) async {

@@ -383,7 +383,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (response.statusCode == 200) {
       Sender sender = await api.convertJsonToSender(response);
       SaveData save = new SaveData();
-      save.saveSender(sender);
+      //save.saveSender(sender);
     }
   }
 
