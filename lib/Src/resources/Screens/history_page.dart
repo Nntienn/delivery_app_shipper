@@ -176,7 +176,7 @@ class _HistoryPageState extends State<HistoryPage> {
     Response response = await api.getTransactionByShipperID(shipperId);
     List<Transaction> list = await api.convertJsonToListTransaction(response);
     List<Transaction> listTransactionTypeSending =
-    await api.getListTransactionTypeSending(list);
+    await api.getListTransactionTypeFinish(list);
     list.clear();
     List<History_Model> listHistoryModel = List();
     for (int i = 0; i < listTransactionTypeSending.length; i++) {
