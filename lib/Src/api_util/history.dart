@@ -17,10 +17,10 @@ class HistoryApi {
     return http.get(GET_TRANSACTION_DETAIL_BY_ID + id);
   }
 
-  Future<List<Transaction>> getListTransactionTypeSending(List<Transaction> list) async {
+  Future<List<Transaction>> getListTransactionTypeFinish(List<Transaction> list) async {
     List<Transaction> listResult = List();
     list.forEach((element) {
-      if (element.type.compareTo("sending") == 0) {
+      if (element.type.compareTo("Finish") == 0) {
         listResult.add(element);
       }
     });

@@ -7,6 +7,7 @@
 
 import 'package:delivery_app_shipper_shipper/Src/api_util/home.dart';
 import 'package:delivery_app_shipper_shipper/Src/app.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/transaction.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/transaction_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,9 +16,9 @@ import 'package:delivery_app_shipper_shipper/main.dart';
 import 'package:http/http.dart';
 
 Future<void> main() async {
-  RequestCartApi api = new RequestCartApi();
+  HomeApi api = new HomeApi();
   var date = new DateTime.now().toString();
-  TransactionDetail model = new TransactionDetail.n(10, date, date, "UnFinished");
-  Response response = await api.acceptSending(model);
-  print(response.statusCode);
+  Transaction model = new Transaction.n(7, "SPQujaevilyrae");
+  await api.updateTransaction(model);
+
 }
