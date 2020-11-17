@@ -34,9 +34,9 @@ class MyMapsState extends State<HomePage> {
   List<LatLng> polylineCoordinates = [];
   Location _location = Location();
   Set<Marker> _markers = {};
-  double _pinPillPosition = 0;
+  double _pinPillPosition = -500;
   String googleAPIKey = "AIzaSyBDJpX-xIqijJq2wLy3sP5lug3LSpYngbo";
-  bool statusconfirm = false;
+  bool statusconfirm = true;
   HomeApi api = new HomeApi();
 
   BitmapDescriptor destinationIcon;
@@ -61,21 +61,21 @@ class MyMapsState extends State<HomePage> {
         'assets/locationpin2.png');
   }
 
-  void setMapPins() {
-    setState(() {
-      _markers.add(Marker(
-        markerId: MarkerId('destPin'),
-        position: MY_LOCATION,
-      ));
-    });
-  }
+  // void setMapPins() {
+  //   setState(() {
+  //     _markers.add(Marker(
+  //       markerId: MarkerId('destPin'),
+  //       position: MY_LOCATION,
+  //     ));
+  //   });
+  // }
 
   @override
   void initState() {
     super.initState();
 
     setSourceAndDestinationIcons();
-    setMapPins();
+    // setMapPins();
   }
 
   void _onMapCreated(GoogleMapController _cntlr) {
@@ -114,6 +114,7 @@ class MyMapsState extends State<HomePage> {
               onTap: (LatLng location) {
                 setState(() {
                   _pinPillPosition = -500;
+                  statusconfirm = true;
                 });
               },
             ),
@@ -237,6 +238,7 @@ class MyMapsState extends State<HomePage> {
           setState(() {
             _pinPillPosition = -500;
             statusconfirm = true;
+            onClickedDone();
           });
         },
       );
@@ -250,6 +252,7 @@ class MyMapsState extends State<HomePage> {
     var date = new DateTime.now().toString();
     TransactionDetail model = new TransactionDetail.n(transactionDetailID, pickedTime, date, "Finish");
     Response response = await api.doneTransaction(model);
+    print(response.statusCode);
     if (response.statusCode == 200) {
       String shipperId = await save.getId();
       Transaction transaction = new Transaction.n(transactionDetailID, shipperId);

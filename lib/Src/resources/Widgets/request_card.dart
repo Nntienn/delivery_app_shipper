@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
 
-class RequestCard extends StatelessWidget {
+class RequestCard extends StatefulWidget {
   final TransactionDetail transactionDetail;
   final Function press;
 
@@ -15,6 +15,17 @@ class RequestCard extends StatelessWidget {
     this.press,
   }) : super(key: key);
 
+  @override
+  State<StatefulWidget> createState() {
+    // TODO: implement createState
+    return RequestStrate(transactionDetail, press);
+  }
+}
+
+class RequestStrate extends State<RequestCard>{
+  TransactionDetail transactionDetail;
+  Function press;
+  RequestStrate(this.transactionDetail,  this.press);
   @override
   Widget build(BuildContext context) {
     RequestCartApi api = new RequestCartApi();
@@ -60,7 +71,7 @@ class RequestCard extends StatelessWidget {
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 22, 0),
                   child: Text(
-                    transactionDetail.amount.toString(),//thay bằng số tiền
+                    transactionDetail.amount.toStringAsFixed(3),//thay bằng số tiền
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 )
@@ -76,8 +87,8 @@ class RequestCard extends StatelessWidget {
                 Container(height: 18,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.blueAccent,
-                      borderRadius: BorderRadius.all(Radius.circular(10))
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.all(Radius.circular(10))
                     ),
 
                     child: FlatButton(
