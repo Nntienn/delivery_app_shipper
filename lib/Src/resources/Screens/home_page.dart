@@ -80,8 +80,6 @@ class MyMapsState extends State<HomePage> {
 
   void _onMapCreated(GoogleMapController _cntlr) {
     _controller = _cntlr;
-
-    print(_location.getLocation().toString());
     _location.onLocationChanged.listen((l) {
       _controller.animateCamera(
         CameraUpdate.newCameraPosition(CameraPosition(
@@ -135,7 +133,7 @@ class MyMapsState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: 330,
+                  height: 350,
                   padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
                   margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                   decoration: BoxDecoration(

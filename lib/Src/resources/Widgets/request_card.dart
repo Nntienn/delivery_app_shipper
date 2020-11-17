@@ -47,7 +47,6 @@ class RequestCard extends StatelessWidget {
       }
     }
 
-
     return GestureDetector(
       onTap: press,
       child: Container(
@@ -70,7 +69,6 @@ class RequestCard extends StatelessWidget {
             Text('From:' + transactionDetail.senderAddress, overflow: TextOverflow.ellipsis),//đoạn này cộng chuỗi lấy điểm nhận
             Text('Phone: ' + transactionDetail.receiverPhoneNum),//Đoạn này cộng chuỗi lấy thời gian gửi
             Text('To: ' + transactionDetail.receiverAddress, overflow: TextOverflow.ellipsis),
-
             Row(
               children: [
                 Text('Distance: ' + transactionDetail.distance.toString()),
@@ -94,7 +92,7 @@ class RequestCard extends StatelessWidget {
               ],
             ),
             SizedBox(
-              height: 14,
+              height: 1,
             ),
             const Divider(
               height: 1,
@@ -102,9 +100,9 @@ class RequestCard extends StatelessWidget {
               indent: 20,
               endIndent: 20,
             ),
-            SizedBox(
-              height: 5,
-            ),
+            // SizedBox(
+            //   height: 5,
+            // ),
           ],
         ),
       ),
