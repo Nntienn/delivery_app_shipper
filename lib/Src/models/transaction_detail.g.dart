@@ -12,6 +12,7 @@ TransactionDetail _$TransactionDetailFromJson(Map<String, dynamic> json) {
     ..receiverName = json['receiverName'] as String
     ..receiverPhoneNum = json['receiverPhoneNum'] as String
     ..receiverAddress = json['receiverAddress'] as String
+    ..senderAddress = json['senderAddress'] as String
     ..status = json['status'] as String
     ..description = json['description'] as String
   ;
@@ -28,6 +29,14 @@ Map<String, dynamic> _$TransactionDetailToJson(TransactionDetail instance) => <S
   'receiverName': instance.receiverName,
   'receiverPhoneNum': instance.receiverPhoneNum,
   'receiverAddress': instance.receiverAddress,
+  'senderAddress': instance.senderAddress,
   'status': instance.status,
   'description': instance.description,
+};
+
+Map<String, dynamic> _$TransactionDetailPartToJson(TransactionDetail instance) => <String, dynamic>{
+  'transactionDetailsId': instance.transactionDetailsId,
+  'pickedTime': instance.pickedTime,
+  'completedTime': instance.completedTime,
+  'status': instance.status,
 };

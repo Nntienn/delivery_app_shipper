@@ -4,16 +4,15 @@ part 'shipper.g.dart';
 
 @JsonSerializable()
 class Shipper {
-  String id;
-  String name;
-  String homeAddress;
-  String workAddress;
+  String shipperId;
   String phoneNum;
+  String name;
+  String cmnd;
   String walletId;
 
   Shipper();
-  Shipper.n(this.id, this.name, this.homeAddress, this.workAddress, this.phoneNum, this.walletId);
-  Shipper.m(this.name, this.homeAddress, this.workAddress, this.phoneNum);
+  Shipper.n(this.shipperId, this.name, this.cmnd, this.phoneNum, this.walletId);
+  Shipper.m(this.name, this.cmnd , this.phoneNum);
 
   factory Shipper.fromJson(Map<String, dynamic> json) => _$ShipperFromJson(json);
   Map<String, dynamic> toJson() => _$ShipperToJson(this);

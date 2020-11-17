@@ -1,18 +1,53 @@
-import 'package:delivery_app_shipper_shipper/Src/models/Product.dart';
+
+import 'package:delivery_app_shipper_shipper/Src/api_util/request_card_api.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/transaction_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
 
 class RequestCard extends StatelessWidget {
-  final Product product;
+  final TransactionDetail transactionDetail;
   final Function press;
 
   const RequestCard({
     Key key,
-    this.product,
+    this.transactionDetail,
     this.press,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    RequestCartApi api = new RequestCartApi();
+    SaveData save = new SaveData();
+
+    Future<void> onClickAccept(String status) async {
+      var date = new DateTime.now().toString();
+      TransactionDetail model = new TransactionDetail.n(transactionDetail.transactionDetailsId, date, date, status);
+      Response response = await api.acceptSending(model);
+      if (response.statusCode != 200) {
+        return showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Failed'),
+              content: Text('Cannot accept'),
+              actions: [
+                FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        save.saveTransactionDetail(model);
+      }
+    }
+
+
     return GestureDetector(
       onTap: press,
       child: Container(
@@ -21,22 +56,24 @@ class RequestCard extends StatelessWidget {
           children: <Widget>[
             Row(
               children: [
-                Text('Sender:'),
+                Text('Receiver: ' + transactionDetail.receiverName, overflow: TextOverflow.ellipsis,),
                 Spacer(),
                 Container(
                   margin: const EdgeInsets.fromLTRB(0, 0, 22, 0),
                   child: Text(
-                    'Price',//thay bằng số tiền
+                    transactionDetail.amount.toString(),//thay bằng số tiền
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 )
               ],
             ),//đoạn này cộng chuỗi lấy điểm gửi
-            Text('From:'),//đoạn này cộng chuỗi lấy điểm nhận
-            Text('Receiver:'),//Đoạn này cộng chuỗi lấy thời gian gửi
+            Text('From:' + transactionDetail.senderAddress, overflow: TextOverflow.ellipsis),//đoạn này cộng chuỗi lấy điểm nhận
+            Text('Phone: ' + transactionDetail.receiverPhoneNum),//Đoạn này cộng chuỗi lấy thời gian gửi
+            Text('To: ' + transactionDetail.receiverAddress, overflow: TextOverflow.ellipsis),
+
             Row(
               children: [
-                Text('To'),
+                Text('Distance: ' + transactionDetail.distance.toString()),
                 Spacer(),
                 Container(height: 18,
                   child: Container(
@@ -44,8 +81,11 @@ class RequestCard extends StatelessWidget {
                       color: Colors.blueAccent,
                       borderRadius: BorderRadius.all(Radius.circular(10))
                     ),
-                    
+
                     child: FlatButton(
+                      onPressed: () {
+                        onClickAccept("Sending");
+                      },
                       child: Text('Accept', textAlign: TextAlign.end,style: TextStyle(color: Colors.white, fontSize: 13),),
                     ),
                   ),

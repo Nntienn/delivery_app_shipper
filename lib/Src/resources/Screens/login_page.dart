@@ -3,7 +3,6 @@ import 'package:delivery_app_shipper_shipper/Src/blocs/login_bloc.dart';
 import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
 import 'package:delivery_app_shipper_shipper/Src/blocs/validation_bloc.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/account.dart';
-import 'package:delivery_app_shipper_shipper/Src/models/sender.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/shipper.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/wallet.dart';
 import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/sign_in.dart';
@@ -13,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 import 'main_page.dart';
-import 'register_page.dart';
 
 final phoneNumberController = TextEditingController();
 
@@ -223,6 +221,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_validationBloc.isValidLogIn(phoneNumberController.text)) {
       Response response =
       await _loginBloc.getAccountJsonByPhone(phoneNumberController.text);
+      print(response.body);
       if (response.statusCode == 200) {
         String checkRole = await _loginBloc.getAccountRole(response);
         if (checkRole.compareTo("success") == 0) {

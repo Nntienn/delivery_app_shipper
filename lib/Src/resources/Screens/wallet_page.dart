@@ -74,10 +74,13 @@ class WalletPage extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Text(
-                        '700.000Vnđ',
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
+                      FutureBuilder(
+                        future: save.getBalance(),
+                        builder: (context, snapshot) => Text(
+                          snapshot.data.toString(),
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
                       )
                     ],
                   )

@@ -16,3 +16,8 @@ Map<String, dynamic> _$TransactionToJson(Transaction instance) => <String, dynam
   'shipperId': instance.shipperId,
   'type': instance.type,
 };
+
+Map<String, dynamic> _$TransactionToJsonPart(Transaction instance) => <String, dynamic>{
+  'transactionDetailsId': instance.transactionDetailsId,
+  'shipperId': instance.shipperId,
+};

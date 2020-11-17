@@ -1,16 +1,15 @@
 
 
-
-import 'package:delivery_app_shipper_shipper/Src/models/Product.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/history_model.dart';
 import 'package:flutter/material.dart';
 
 class ItemCard extends StatelessWidget {
-  final Product product;
+  final History_Model history;
   final Function press;
 
   const ItemCard({
     Key key,
-    this.product,
+    this.history,
     this.press,
   }) : super(key: key);
 

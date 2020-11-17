@@ -1,4 +1,8 @@
+import 'package:delivery_app_shipper_shipper/Src/blocs/shared_preferences.dart';
+import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/sign_in.dart';
 import 'package:flutter/material.dart';
+
+import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget{
   @override
@@ -10,13 +14,12 @@ class ProfilePage extends StatefulWidget{
 }
 
 class ProfileState extends State<ProfilePage>{
+  SaveData save = new SaveData();
+
   final String _fullName = "Thuan Hoang";
   final String _status = "Software Developer";
   final String _bio =
       "\"Hi, I am a Freelance developer working for hourly basis. If you wants to contact me to build your product leave a message.\"";
-  final String _followers = "173";
-  final String _posts = "24";
-  final String _scores = "450";
 
   Widget _buildCoverImage(Size screenSize) {
     return Container(
@@ -37,7 +40,7 @@ class ProfileState extends State<ProfilePage>{
         height: 150.0,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/thuan.jpg'),
+            image: AssetImage('assets/profile.png'),
             fit: BoxFit.cover,
           ),
           borderRadius: BorderRadius.circular(80.0),
@@ -60,31 +63,17 @@ class ProfileState extends State<ProfilePage>{
 
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-      child: Text(
-        _fullName,
-        style: _nameTextStyle,
-      ),
-    );
-  }
-
-  Widget _buildStatus(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: Text(
-        _status,
-        style: TextStyle(
-          fontFamily: 'Spectral',
-          color: Colors.black,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w300,
+      child: FutureBuilder(
+        future: save.getName(),
+        initialData: [],
+        builder: (context, snapshot) => Text(
+          snapshot.data,
+          style: _nameTextStyle,
         ),
       ),
     );
   }
+
 
   Widget _buildStatItem(String label) {
     TextStyle _statLabelTextStyle = TextStyle(
@@ -165,7 +154,7 @@ class ProfileState extends State<ProfilePage>{
         children: <Widget>[
           Expanded(
             child: InkWell(
-              onTap: () => print("followed"),
+              onTap: _onClickLogOut,
               child: Container(
                 height: 40.0,
                 decoration: BoxDecoration(
@@ -184,27 +173,7 @@ class ProfileState extends State<ProfilePage>{
               ),
             ),
           ),
-          // SizedBox(width: 10.0),
-          // Expanded(
-          //   child: InkWell(
-          //     onTap: () => print("Message"),
-          //     child: Container(
-          //       height: 40.0,
-          //       decoration: BoxDecoration(
-          //         border: Border.all(),
-          //       ),
-          //       child: Center(
-          //         child: Padding(
-          //           padding: EdgeInsets.all(10.0),
-          //           child: Text(
-          //             "MESSAGE",
-          //             style: TextStyle(fontWeight: FontWeight.w600),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+
         ],
       ),
     );
@@ -218,28 +187,53 @@ class ProfileState extends State<ProfilePage>{
         children: <Widget>[
           _buildCoverImage(screenSize),
           SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(height: screenSize.height / 6.3),
-                  _buildProfileImage(),
-                  _buildFullName(),
-                  _buildStatus(context),
-                  _buildStatContainer("Phone", "0961515949"),
-                  _buildStatContainer("Address", "47B Vườn Lài quận 12"),
-                  _buildStatContainer("Wallet", "700.000Vnđ"),
-                  _buildStatContainer("Office Address", "13A Hoàng Diệu Quận 2"),
-                  _buildSeparator(screenSize),
-                  SizedBox(height: 10.0),
-                  // _buildGetInTouch(context),
-                  SizedBox(height: 8.0),
-                  _buildButtons(),
-                ],
+            child: FutureBuilder<List<String>>(
+              future: getData(),
+              initialData: [],
+              builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) =>SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: screenSize.height / 6.3),
+                    _buildProfileImage(),
+                    _buildFullName(),
+                    _buildStatContainer("Phone", snapshot.data[0]),
+                    _buildStatContainer("Identify Card", snapshot.data[1]),
+                    _buildStatContainer("Wallet", snapshot.data[2]),
+                    _buildSeparator(screenSize),
+                    SizedBox(height: 10.0),
+                    // _buildGetInTouch(context),
+                    SizedBox(height: 8.0),
+                    _buildButtons(),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<List<String>> getData() async {
+    List<String> list = List();
+    String phoneNum = await save.getPhoneNum();
+    String cmnd = await save.getIdentifyCard();
+    double balance = await save.getBalance();
+    String wallet = balance.toString();
+    list.add(phoneNum);
+    list.add(cmnd);
+    list.add(wallet);
+    return list;
+  }
+
+  Future<void> _onClickLogOut() {
+    save.logOut();
+    try {
+      googleSignIn.signOut();
+    } catch(err) {
+      print('$err');
+    }
+    Navigator.push(
+        this.context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 }

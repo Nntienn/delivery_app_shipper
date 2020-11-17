@@ -1,12 +1,18 @@
 
 import 'package:delivery_app_shipper_shipper/Src/configs/constants.dart';
 import 'package:delivery_app_shipper_shipper/Src/models/Product.dart';
+import 'package:delivery_app_shipper_shipper/Src/models/history_model.dart';
 import 'package:delivery_app_shipper_shipper/Src/resources/Widgets/delivery_history_card.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
+import '../../api_util/history.dart';
+import '../../blocs/shared_preferences.dart';
+import '../../models/transaction.dart';
+import '../../models/transaction_detail.dart';
 import 'booking_detail.dart';
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   // @override
   // Widget build(BuildContext context) {
   //   return Container(
@@ -156,6 +162,44 @@ class HistoryPage extends StatelessWidget {
   //   );
   // }
   @override
+  _HistoryPageState createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  SaveData save = new SaveData();
+
+  HistoryApi api = new HistoryApi();
+
+  Future<List<History_Model>> getListTransaction() async {
+    String shipperId = await save.getId();
+    print(shipperId);
+    Response response = await api.getTransactionByShipperID(shipperId);
+    List<Transaction> list = await api.convertJsonToListTransaction(response);
+    List<Transaction> listTransactionTypeSending =
+    await api.getListTransactionTypeSending(list);
+    list.clear();
+    List<History_Model> listHistoryModel = List();
+    for (int i = 0; i < listTransactionTypeSending.length; i++) {
+      Response json = await api.getTransactionDetailByID(
+          listTransactionTypeSending[i].transactionDetailsId.toString());
+      print(json.body);
+      TransactionDetail transactionDetail =
+      await api.convertJsonToTransactionDetail(json);
+      print(transactionDetail.transactionDetailsId.toString() +
+          transactionDetail.receiverAddress);
+      listHistoryModel.add(new History_Model(
+          listTransactionTypeSending[i].type,
+          transactionDetail.senderAddress,
+          transactionDetail.receiverAddress,
+          transactionDetail.useTime,
+          transactionDetail.status,
+          transactionDetail.amount));
+    }
+    listTransactionTypeSending.clear();
+    return listHistoryModel;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,24 +231,31 @@ class HistoryPage extends StatelessWidget {
                   ),
                 ]),
             // padding: const EdgeInsets.symmetric(horizontal: kDefaultPaddin),
-            child: GridView.builder(
-                itemCount: products.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  // mainAxisSpacing: kDefaultPaddin,
-                  crossAxisSpacing: kDefaultPaddin,
-                  childAspectRatio: 4,
-                ),
-                itemBuilder: (context, index) => ItemCard(
-                  product: products[index],
-                  press: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BookingDetailPage(
-                          product: products[index],
-                        ),
-                      )),
-                )),
+            child: FutureBuilder<List<History_Model>>(
+              future: getListTransaction(),
+              initialData: [],
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<History_Model>> snapshot) =>
+                  GridView.builder(
+                    itemCount: (snapshot.data != null) ? snapshot.data.length : 0,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      // mainAxisSpacing: kDefaultPaddin,
+                      crossAxisSpacing: kDefaultPaddin,
+                      childAspectRatio: 4,
+                    ),
+                    itemBuilder: (context, index) => ItemCard(
+                      history: snapshot.data[index],
+                      // press: () => Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => BookingDetailPage(
+                      //         history: snapshot.data[index],
+                      //       ),
+                      //     )),
+                    ),
+                  ),
+            ),
           ),
         ),
       ],
